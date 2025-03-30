@@ -13,19 +13,22 @@ pub struct AggregateReporter {
 
 impl AggregateReporter {
     pub fn create(config: ObservabilityConfig) -> AggregateReporter {
-        let jaeger = config
-            .jaeger
-            .map(|j| fastrace_jaeger::JaegerReporter::new(j.agent_addr, j.service_name).unwrap());
-        let datadog = config.datadog.map(|d| {
-            fastrace_datadog::DatadogReporter::new(
+        let mut jaeger = None;
+        if let Some(j) = config.jaeger {
+            jaeger = Some(fastrace_jaeger::JaegerReporter::new(j.agent_addr, j.service_name).unwrap());
+        }
+        let mut datadog = None;
+        if let Some(d) = config.datadog {
+            datadog = Some(fastrace_datadog::DatadogReporter::new(
                 d.agent_addr,
                 d.tracer_mode,
                 d.service_name,
                 d.env,
-            )
-        });
-        let opentelemetry = config.opentelemetry.map(|o| {
-            fastrace_opentelemetry::OpenTelemetryReporter::new(
+            ));
+        }
+        let mut opentelemetry = None;
+        if let Some(o) = config.opentelemetry {
+            opentelemetry = Some(fastrace_opentelemetry::OpenTelemetryReporter::new(
                 opentelemetry_otlp::SpanExporter::builder()
                     .with_tonic()
                     .with_endpoint(o.endpoint)
@@ -49,8 +52,8 @@ impl AggregateReporter {
                 opentelemetry::InstrumentationScope::builder("example-crate")
                     .with_version(env!("CARGO_PKG_VERSION"))
                     .build(),
-            )
-        });
+            ));
+        }
         AggregateReporter {
             jaeger,
             datadog,
