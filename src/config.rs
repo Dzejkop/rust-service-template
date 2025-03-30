@@ -1,3 +1,5 @@
+use std::net::SocketAddr;
+
 use serde::{Deserialize, Serialize};
 
 pub mod observability;
@@ -7,10 +9,12 @@ pub const CONFIG_PREFIX: &str = "APP";
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ServiceConfig {
     pub db: DbConfig,
+
     #[serde(default)]
     pub observability: observability::ObservabilityConfig,
+
     #[serde(default = "default::server_addr")]
-    pub server_addr: String,
+    pub host: SocketAddr,
 }
 
 impl ServiceConfig {
@@ -47,11 +51,13 @@ pub struct DbConfig {
 }
 
 mod default {
+    use super::*;
+
     pub fn bool_true() -> bool {
         true
     }
 
-    pub fn server_addr() -> String {
-        "0.0.0.0:3000".into()
+    pub fn server_addr() -> SocketAddr {
+        ([0, 0, 0, 0], 3000).into()
     }
 }

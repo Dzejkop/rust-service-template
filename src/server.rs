@@ -1,9 +1,9 @@
 use async_signal::{Signal, Signals};
 use bon::builder;
 use futures::StreamExt;
-use poem::{Route, listener::TcpListener};
+use poem::{Route, listener::TcpAcceptor};
 use poem_openapi::{OpenApi, OpenApiService, param::Query, payload::PlainText};
-use std::net::SocketAddr;
+use tokio::net::TcpListener;
 
 pub struct App {}
 
@@ -18,7 +18,7 @@ impl App {
 #[builder]
 pub async fn serve(
     app: App,
-    servers: Vec<String>,
+    #[builder(default)] servers: Vec<String>,
     listener: TcpListener,
 ) -> eyre::Result<()> {
     let mut api_service =
@@ -32,7 +32,8 @@ pub async fn serve(
 
     let app = Route::new().nest("/api", api_service).nest("/explore", ui);
 
-    poem::Server::new(listener)
+    let acceptor = TcpAcceptor::from_tokio(listener)?;
+    poem::Server::new_with_acceptor(acceptor)
         .run_with_graceful_shutdown(
             app,
             async {

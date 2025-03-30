@@ -1,6 +1,7 @@
 use fastrace::collector::Config;
 use logforth::{append, filter::EnvFilter};
 use observability::AggregateReporter;
+use tokio::net::TcpListener;
 
 pub mod config;
 pub mod database;
@@ -27,9 +28,13 @@ async fn main() -> eyre::Result<()> {
         Config::default(),
     );
 
-    log::info!("Starting!");
+    // TODO: Init from config
+    let app = server::App {};
 
-    testing_traces().await;
+    let listener = TcpListener::bind(config.host).await?;
+
+    log::info!("Server listening on {}", listener.local_addr()?);
+    server::serve().app(app).listener(listener).call().await?;
 
     fastrace::flush();
 
