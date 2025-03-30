@@ -31,10 +31,20 @@ async fn main() -> eyre::Result<()> {
     // TODO: Init from config
     let app = server::App {};
 
-    let listener = TcpListener::bind(config.host).await?;
+    let listener = TcpListener::bind(config.server.host).await?;
 
     log::info!("Server listening on {}", listener.local_addr()?);
-    server::serve().app(app).listener(listener).call().await?;
+    let mut servers = vec![];
+    if let Some(server) = config.server.server {
+        log::info!("Will server explorer at {server}");
+        servers.push(server);
+    }
+    server::serve()
+        .app(app)
+        .servers(servers)
+        .listener(listener)
+        .call()
+        .await?;
 
     fastrace::flush();
 

@@ -24,11 +24,11 @@ pub async fn serve(
     let mut api_service =
         OpenApiService::new(app, env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
 
-    let ui = api_service.swagger_ui();
-
     for server in servers {
         api_service = api_service.server(server);
     }
+
+    let ui = api_service.swagger_ui();
 
     let app = Route::new().nest("/api", api_service).nest("/explore", ui);
 

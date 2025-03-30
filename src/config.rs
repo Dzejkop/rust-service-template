@@ -13,8 +13,8 @@ pub struct ServiceConfig {
     #[serde(default)]
     pub observability: observability::ObservabilityConfig,
 
-    #[serde(default = "default::server_addr")]
-    pub host: SocketAddr,
+    #[serde(default)]
+    pub server: ServerConfig,
 }
 
 impl ServiceConfig {
@@ -48,6 +48,25 @@ pub struct DbConfig {
     /// Whether to run migrations
     #[serde(default = "default::bool_true")]
     pub migrate: bool,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct ServerConfig {
+    #[serde(default = "default::server_addr")]
+    pub host: SocketAddr,
+
+    /// An optional address for the API explorer ui
+    #[serde(default)]
+    pub server: Option<String>,
+}
+
+impl Default for ServerConfig {
+    fn default() -> Self {
+        Self {
+            host: default::server_addr(),
+            server: None,
+        }
+    }
 }
 
 mod default {
