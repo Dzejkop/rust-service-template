@@ -9,6 +9,8 @@ pub struct ServiceConfig {
     pub db: DbConfig,
     #[serde(default)]
     pub observability: observability::ObservabilityConfig,
+    #[serde(default = "default::server_addr")]
+    pub server_addr: String,
 }
 
 impl ServiceConfig {
@@ -47,5 +49,9 @@ pub struct DbConfig {
 mod default {
     pub fn bool_true() -> bool {
         true
+    }
+
+    pub fn server_addr() -> String {
+        "0.0.0.0:3000".into()
     }
 }
