@@ -19,8 +19,7 @@ impl App {
 pub async fn serve(
     app: App,
     servers: Vec<String>,
-    listener: Option<TcpListener>,
-    socket_addr: Option<SocketAddr>,
+    listener: TcpListener,
 ) -> eyre::Result<()> {
     let mut api_service =
         OpenApiService::new(app, env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
@@ -33,13 +32,6 @@ pub async fn serve(
 
     let app = Route::new().nest("/api", api_service).nest("/explore", ui);
 
-    let listener = if let Some(listener) = listener {
-        listener
-    } else {
-        let addr =
-            socket_addr.unwrap_or_else(|| "0.0.0.0:3000".parse().expect("Invalid socket address"));
-        TcpListener::bind(addr.to_string().as_str())
-    };
     poem::Server::new(listener)
         .run_with_graceful_shutdown(
             app,
