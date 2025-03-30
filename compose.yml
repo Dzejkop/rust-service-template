@@ -24,6 +24,13 @@ services:
     volumes:
       - grafana-storage:/var/lib/grafana
 
+  tempo:
+    image: grafana/tempo:latest
+    container_name: tempo
+    restart: unless-stopped
+    ports:
+      - "3100:3100"
+
 volumes:
   pgdata:
   grafana-storage:
