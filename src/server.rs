@@ -16,7 +16,9 @@ impl App {
 
 #[builder]
 pub async fn serve(app: App, servers: Vec<String>) -> eyre::Result<()> {
-    let mut api_service = OpenApiService::new(app, "App", "1.0");
+    let mut api_service =
+        OpenApiService::new(app, env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
+
     let ui = api_service.swagger_ui();
 
     for server in servers {
