@@ -40,14 +40,6 @@ pub struct DbConfig {
     /// The db connection string
     /// i.e. postgresql://user:password@localhost:5432/dbname
     pub connection_string: String,
-
-    /// Whether to create the database if it does not exist
-    #[serde(default = "default::bool_true")]
-    pub create: bool,
-
-    /// Whether to run migrations
-    #[serde(default = "default::bool_true")]
-    pub migrate: bool,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -71,10 +63,6 @@ impl Default for ServerConfig {
 
 mod default {
     use super::*;
-
-    pub fn bool_true() -> bool {
-        true
-    }
 
     pub fn server_addr() -> SocketAddr {
         ([0, 0, 0, 0], 3000).into()
