@@ -1,7 +1,7 @@
 dev: install-cargo-watch dev-up
   cargo watch -x run
 
-dev-up: install-sqlx-cli
+dev-up: copy-env-dev install-sqlx-cli
   docker compose up -d
   # This command ensures postgres is ready to accept connections
   docker compose exec postgres /bin/bash -c "until pg_isready; do sleep 1; done"
@@ -22,3 +22,6 @@ install-sqlx-cli:
 
 install-cargo-watch:
   cargo install --locked cargo-watch
+
+copy-env-dev:
+  cp .env.dev .env

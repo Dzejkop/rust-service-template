@@ -13,6 +13,12 @@ A template for a Rust service that comes with:
 
 ## Getting started
 
+Clone the template with:
+
+```bash
+git clone --depth 1 git@github.com:Dzejkop/rust-service-template.git; rm -rf ./rust-service-template/.git
+```
+
 Make sure you have mise & docker with docker-compose installed and then run `just dev-up`. This command will provision the database including migrations. Next you can simply run:
 
 ```bash
