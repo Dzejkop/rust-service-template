@@ -39,6 +39,8 @@ async fn main() -> eyre::Result<()> {
         log::info!("Will server explorer at {server}");
         servers.push(server);
     }
+    testing_traces().await;
+
     server::serve()
         .app(app)
         .servers(servers)
@@ -53,5 +55,6 @@ async fn main() -> eyre::Result<()> {
 
 #[tracing::instrument]
 async fn testing_traces() {
-    tracing::info!("Testing!");
+    tracing::info!("Tracing macros work!");
+    log::info!("Log also works!");
 }
