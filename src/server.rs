@@ -36,7 +36,8 @@ pub async fn serve(
     let listener = if let Some(listener) = listener {
         listener
     } else {
-        let addr = socket_addr.unwrap_or_else(|| "0.0.0.0:3000".parse().expect("Invalid socket address"));
+        let addr =
+            socket_addr.unwrap_or_else(|| "0.0.0.0:3000".parse().expect("Invalid socket address"));
         TcpListener::bind(addr.to_string().as_str())
     };
     poem::Server::new(listener)
