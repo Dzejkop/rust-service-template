@@ -1,3 +1,4 @@
+use crate::error::Error;
 use async_signal::{Signal, Signals};
 use bon::builder;
 use fastrace_poem::FastraceMiddleware;
@@ -5,7 +6,7 @@ use futures::StreamExt;
 use poem::{EndpointExt, Route, listener::TcpAcceptor};
 use poem_openapi::{
     OpenApi, OpenApiService,
-    param::{Path, Query},
+    param::Path,
     payload::{Json, PlainText},
 };
 use tokio::net::TcpListener;
@@ -29,26 +30,31 @@ impl App {
 
 #[OpenApi]
 impl App {
-    #[oai(path = "/echo", method = "get")]
-    pub async fn echo(&self, text: Query<String>) -> PlainText<String> {
+    /// Echoes the text back
+    #[oai(path = "/echo", method = "post")]
+    pub async fn echo(&self, text: PlainText<String>) -> PlainText<String> {
         PlainText(text.0)
     }
 
-    /// Healthcheck method, for now it always returns 200
+    /// Healthcheck method
+    ///
+    /// for now it always returns 200
     #[oai(path = "/health", method = "get")]
     pub async fn health(&self) {}
 
     /// Saves a value to the db
     #[oai(path = "/something/:something", method = "post")]
-    pub async fn create_something(&self, something: Path<String>) {
-        self.db.insert_something(something.0).await;
+    pub async fn create_something(&self, something: Path<String>) -> Result<(), Error> {
+        self.db.insert_something(something.0).await?;
+
+        Ok(())
     }
 
     #[oai(path = "/somethings", method = "get")]
-    pub async fn get_somethings(&self) -> Json<Vec<String>> {
-        let all = self.db.fetch_all().await;
+    pub async fn get_somethings(&self) -> Result<Json<Vec<String>>, Error> {
+        let all = self.db.fetch_all().await?;
 
-        Json(all)
+        Ok(Json(all))
     }
 }
 
@@ -66,10 +72,12 @@ pub async fn serve(
     }
 
     let ui = api_service.swagger_ui();
+    let spec = api_service.spec();
 
     let app = Route::new()
         .nest("/", api_service)
-        .nest("/explore", ui)
+        .nest("/swagger", ui)
+        .at("/spec", poem::endpoint::make_sync(move |_| spec.clone()))
         .with(FastraceMiddleware);
 
     let acceptor = TcpAcceptor::from_tokio(listener)?;

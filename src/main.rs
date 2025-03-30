@@ -5,6 +5,7 @@ use tokio::net::TcpListener;
 
 pub mod config;
 pub mod database;
+pub mod error;
 pub mod logging;
 pub mod observability;
 pub mod server;
