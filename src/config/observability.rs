@@ -1,5 +1,5 @@
+use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
-use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ObservabilityConfig {
