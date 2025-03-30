@@ -15,7 +15,11 @@ impl App {
 }
 
 #[builder]
-pub async fn serve(app: App, servers: Vec<String>, socket_addr: Option<String>) -> eyre::Result<()> {
+pub async fn serve(
+    app: App,
+    servers: Vec<String>,
+    socket_addr: Option<String>,
+) -> eyre::Result<()> {
     let mut api_service =
         OpenApiService::new(app, env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
 
