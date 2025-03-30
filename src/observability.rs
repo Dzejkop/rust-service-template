@@ -1,9 +1,9 @@
 use std::borrow::Cow;
 
+use crate::config::observability::ObservabilityConfig;
 use fastrace::collector::Reporter;
 use fastrace::prelude::*;
 use opentelemetry_otlp::WithExportConfig;
-use crate::config::observability::ObservabilityConfig;
 
 pub struct AggregateReporter {
     jaeger: Option<fastrace_jaeger::JaegerReporter>,
@@ -13,9 +13,9 @@ pub struct AggregateReporter {
 
 impl AggregateReporter {
     pub fn create(config: ObservabilityConfig) -> AggregateReporter {
-        let jaeger = config.jaeger.map(|j| {
-            fastrace_jaeger::JaegerReporter::new(j.agent_addr, j.service_name).unwrap()
-        });
+        let jaeger = config
+            .jaeger
+            .map(|j| fastrace_jaeger::JaegerReporter::new(j.agent_addr, j.service_name).unwrap());
         let datadog = config.datadog.map(|d| {
             fastrace_datadog::DatadogReporter::new(
                 d.agent_addr,
@@ -31,7 +31,7 @@ impl AggregateReporter {
                     .with_endpoint(o.endpoint)
                     .with_protocol(match o.protocol.to_lowercase().as_str() {
                         "grpc" => opentelemetry_otlp::Protocol::Grpc,
-                        "http" => opentelemetry_otlp::Protocol::HttpProto,
+                        "http" => opentelemetry_otlp::Protocol::HttpJson,
                         _ => opentelemetry_otlp::Protocol::Grpc,
                     })
                     .with_timeout(opentelemetry_otlp::OTEL_EXPORTER_OTLP_TIMEOUT_DEFAULT)
@@ -72,4 +72,3 @@ impl Reporter for AggregateReporter {
         }
     }
 }
-
