@@ -11,26 +11,5 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-
-  grafana:
-    image: grafana/grafana:latest
-    container_name: grafana
-    restart: unless-stopped
-    environment:
-      GF_SECURITY_ADMIN_PASSWORD: admin
-      GF_SECURITY_DISABLE_INITIAL_ADMIN_PASSWORD_CHANGE: "true"
-    ports:
-      - "3000:3000"
-    volumes:
-      - grafana-storage:/var/lib/grafana
-
-  tempo:
-    image: grafana/tempo:latest
-    container_name: tempo
-    restart: unless-stopped
-    ports:
-      - "3100:3100"
-
 volumes:
   pgdata:
-  grafana-storage:
