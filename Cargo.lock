@@ -996,6 +996,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "fastrace-poem"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b4acf824b7ab3a8ed376995ad3306bd6c57cf913fea2a111fa579650a9d23c74"
+dependencies = [
+ "fastrace",
+ "poem",
+]
+
+[[package]]
 name = "fastrace-tracing"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4951,6 +4961,7 @@ dependencies = [
  "fastrace-datadog",
  "fastrace-jaeger",
  "fastrace-opentelemetry",
+ "fastrace-poem",
  "fastrace-tracing",
  "futures",
  "log",

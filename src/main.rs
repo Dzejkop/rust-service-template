@@ -28,8 +28,7 @@ async fn main() -> eyre::Result<()> {
         Config::default(),
     );
 
-    // TODO: Init from config
-    let app = server::App {};
+    let app = server::App::new(&config).await?;
 
     let listener = TcpListener::bind(config.server.host).await?;
 

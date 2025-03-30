@@ -39,3 +39,4 @@ opentelemetry_sdk = "0.29.0"
 logforth = { version = "0.23.1", features = ["fastrace"] }
 testcontainers = "0.23.3"
 testcontainers-modules = { version = "0.11.6", features = ["postgres"] }
+fastrace-poem = "0.1.0"

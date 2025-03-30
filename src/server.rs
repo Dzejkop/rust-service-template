@@ -1,17 +1,54 @@
 use async_signal::{Signal, Signals};
 use bon::builder;
+use fastrace_poem::FastraceMiddleware;
 use futures::StreamExt;
-use poem::{Route, listener::TcpAcceptor};
-use poem_openapi::{OpenApi, OpenApiService, param::Query, payload::PlainText};
+use poem::{EndpointExt, Route, listener::TcpAcceptor};
+use poem_openapi::{
+    OpenApi, OpenApiService,
+    param::{Path, Query},
+    payload::{Json, PlainText},
+};
 use tokio::net::TcpListener;
 
-pub struct App {}
+use crate::{
+    config::ServiceConfig,
+    database::{Db, something::Something},
+};
+
+pub struct App {
+    db: Db,
+}
+
+impl App {
+    pub async fn new(config: &ServiceConfig) -> eyre::Result<Self> {
+        let db = crate::database::Db::new(&config.db).await?;
+
+        Ok(Self { db })
+    }
+}
 
 #[OpenApi]
 impl App {
     #[oai(path = "/echo", method = "get")]
     pub async fn echo(&self, text: Query<String>) -> PlainText<String> {
         PlainText(text.0)
+    }
+
+    /// Healthcheck method, for now it always returns 200
+    #[oai(path = "/health", method = "get")]
+    pub async fn health(&self) {}
+
+    /// Saves a value to the db
+    #[oai(path = "/something/:something", method = "post")]
+    pub async fn create_something(&self, something: Path<String>) {
+        self.db.insert_something(something.0).await;
+    }
+
+    #[oai(path = "/somethings", method = "get")]
+    pub async fn get_somethings(&self) -> Json<Vec<String>> {
+        let all = self.db.fetch_all().await;
+
+        Json(all)
     }
 }
 
@@ -30,7 +67,10 @@ pub async fn serve(
 
     let ui = api_service.swagger_ui();
 
-    let app = Route::new().nest("/api", api_service).nest("/explore", ui);
+    let app = Route::new()
+        .nest("/", api_service)
+        .nest("/explore", ui)
+        .with(FastraceMiddleware);
 
     let acceptor = TcpAcceptor::from_tokio(listener)?;
     poem::Server::new_with_acceptor(acceptor)
